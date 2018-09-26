@@ -12,6 +12,7 @@ from threading import Thread
 #Create an ADS1015 ADC (12-bit) instance.
 adc = Adafruit_ADS1x15.ADS1015()
 GAIN = 1
+#FANCY
 class Mainframe(tk.Frame):
     # Mainframe contains the widgets
     # More advanced programs may have multiple frames
