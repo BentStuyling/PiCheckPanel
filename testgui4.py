@@ -14,14 +14,12 @@ Created on Fri Aug 24 17:01:19 2018
 
 import tkinter as tk
 from tkinter.font import Font
-import time, random
+import  random
 #import Adafruit_ADS1x15
-from threading import Thread
 
 #Create an ADS1015 ADC (12-bit) instance.
 #adc = Adafruit_ADS1x15.ADS1015()
-GAIN = 1
-#FANCY
+
 
 def get_data():
     '''replace this function with whatever you want to provide the data
@@ -121,6 +119,7 @@ class Mainframe(tk.Frame):
         
     def GetOilTemp(self):
         ## replace this with code to read sensor
+        GAIN = 1
         #self.value = adc.read_adc(0, gain=GAIN)
         self.value = random.randint(-20,120)
         self.OilTemp.set(self.value)
@@ -131,6 +130,7 @@ class Mainframe(tk.Frame):
         
     def GetOilPress(self):
         ## replace this with code to read sensor
+        GAIN = 1
         #self.value = adc.read_adc(1, gain=GAIN)
         self.value = random.randint(0,80)/10
         self.OilPress.set(self.value)
@@ -141,6 +141,7 @@ class Mainframe(tk.Frame):
 
     def GetClntTemp(self):
         ## replace this with code to read sensor
+        GAIN = 1
         #self.value = adc.read_adc(2, gain=GAIN)
         self.value = random.randint(-20,120)
         self.ClntTemp.set(self.value)
@@ -151,6 +152,7 @@ class Mainframe(tk.Frame):
    
     def GetBatVolt(self):
         ## replace this with code to read sensor
+        GAIN = 1
         #self.value = adc.read_adc(3, gain=GAIN)
         self.value = random.randint(0,150)/10
         self.BatVolt.set(self.value)

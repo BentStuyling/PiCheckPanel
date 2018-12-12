@@ -1,45 +1,14 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Dec 10 18:00:16 2018
-
-@author: TQN
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Aug 24 17:01:19 2018
-
-@author: TQN
-"""
-
 import tkinter as tk
 from tkinter.font import Font
-import time, random
+import random
 #import Adafruit_ADS1x15
 import datetime as dt
-from threading import Thread
 import matplotlib.figure as figure
 import matplotlib.animation as animation
 import matplotlib.dates as mdates
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 #Create an ADS1015 ADC (12-bit) instance.
 #adc = Adafruit_ADS1x15.ADS1015()
-GAIN = 1
-#FANCY
-# Parameters
-
-
-# Declare global variables
-update_interval = 500 # Time (ms) between polling/animation updates
-max_elements = 100     # Maximum number of elements to store in plot lists
-frame = None
-canvas = None
-ax1 = None
-temp_plot_visible = None
-# Global variable to remember various states
-#fullscreen = False
-temp_plot_visible = True
-light_plot_visible = True
 
 class Mainframe(tk.Frame):
     # Mainframe contains the widgets
@@ -109,7 +78,7 @@ class Mainframe(tk.Frame):
         tk.Label(frame_value_row_1,font = UnitFont, fg =Unitcolor,bg = 'black', text = '[BAR]').place(x = 165, y =10, anchor ='w')        
 
         #Coolant Temperature:
-        tk.Label(frame_lable_row_2, font=LabelFont, fg=Labelcolor, bg = 'black', text = 'KUHLW').place(x = 5, y =10)
+        tk.Label(frame_lable_row_2, font=LabelFont, fg=Labelcolor, bg = 'black', text = 'KUHLW.').place(x = 5, y =10)
         self.ClntTemp = tk.IntVar()
         tk.Label(frame_value_row_2, font = ValueFont,fg =Valuecolor,bg = 'black', textvariable = self.ClntTemp).place(x = 45, y =10, anchor ='e')
         tk.Label(frame_value_row_2,font = UnitFont, fg =Unitcolor,bg = 'black', text = '[°C]').place(x = 45, y =10, anchor ='w')        
@@ -122,60 +91,48 @@ class Mainframe(tk.Frame):
 
         # white line in first canvas
         linecanvas_2.create_line(0, 4, 240, 4, fill = 'white')
-
-        #Call Get [value] which will call itself after a delay
-        self.GetOilTemp()
-        self.GetOilPress()
-        self.GetClntTemp()
-        self.GetBatVolt()
-        # Lay out the main container (expand to fit window)
-        #Plotframe.pack(fill=tk.BOTH, expand=1)
-
+               
         # Create figure for plotting
         self.fig = figure.Figure(facecolor= 'black', figsize=(3.3, 2))
-        self.fig.subplots_adjust(left=0.2, right=0.8, bottom = 0.2, top = 1)
-        self.ax1 = self.fig.add_subplot(1, 1, 1, axisbg = 'black')
+        self.fig.subplots_adjust(left=0.2, right=0.8, bottom = 0.2, top = 0.9)
+        self.ax1 = self.fig.add_subplot(1, 1, 1, facecolor = 'black')
         
         # Instantiate a new set of axes that shares the same x-axis
         self.ax2 = self.ax1.twinx()
         
         # Empty x and y lists for storing data to plot later
         self.xs = []
-        self.temps = []
-        self.lights = []
+        self.variables_1 = []
+        self.variables_2 = []
         
         # Variables for holding temperature and light data
-        self.temp_c = tk.DoubleVar()
-        self.lux = tk.DoubleVar()
-        
-        # Create dynamic font for text
-        #dfont = tkFont.Font(size=-24)
+        self.variable_1 = tk.DoubleVar()
+        self.variable_2 = tk.DoubleVar()
         
         # Create a Tk Canvas widget out of our figure
         self.canvas = FigureCanvasTkAgg(self.fig, master=Plotframe)
         #canvas_plot = self.canvas.get_tk_widget()
-        
-        
-        
-        # Add a standard 5 pixel padding to all widgets
+      
+        # Add a standard 1 pixel padding to all widgets
         for w in Plotframe.winfo_children():
-            w.grid(padx=5, pady=5)
-        
-        # Make it so that the grid cells expand out to fill window
-        for i in range(0, 5):
-            Plotframe.rowconfigure(i, weight=1)
-        for i in range(0, 5):
-            Plotframe.columnconfigure(i, weight=1)
+            w.grid(padx=1, pady=1)
 
+        #Call Get [value] which will call itself after a delay
+        self.GetOilTemp()
+        self.GetOilPress()
+        self.GetClntTemp()
+        self.GetBatVolt()
+        
+        # Variables for graph plotting
+        self.update_interval = 500 # Time (ms) between polling/animation updates
+        self.graph_duration = 60 # Time (s) of grap length
+        
         # Call animate() function periodically
-        self.fargs = (self.ax1, self.ax2, self.xs, self.temps, self.lights, self.temp_c, self.lux)
-        self.ani = animation.FuncAnimation(  self.fig, 
-                                        self.animate, 
-                                        fargs=self.fargs, 
-                                        interval=update_interval) 
+        self.fargs = (self.ax1, self.ax2, self.xs, self.variables_1, self.variables_2, self.variable_1, self.variable_2, self.update_interval,self.graph_duration)
+        self.ani = animation.FuncAnimation(  self.fig, self.animate,fargs=self.fargs,interval=self.update_interval) 
         
     def GetOilTemp(self):
-        ## replace this with code to read sensor
+        GAIN = 1
         #self.value = adc.read_adc(0, gain=GAIN)
         self.value = random.randint(-20,120)
         self.OilTemp.set(self.value)
@@ -186,6 +143,7 @@ class Mainframe(tk.Frame):
         
     def GetOilPress(self):
         ## replace this with code to read sensor
+        GAIN = 1
         #self.value = adc.read_adc(1, gain=GAIN)
         self.value = random.randint(0,80)/10
         self.OilPress.set(self.value)
@@ -195,7 +153,7 @@ class Mainframe(tk.Frame):
         self.after(self.TimerInterval,self.GetOilPress)
 
     def GetClntTemp(self):
-        ## replace this with code to read sensor
+        GAIN = 1
         #self.value = adc.read_adc(2, gain=GAIN)
         self.value = random.randint(-20,120)
         self.ClntTemp.set(self.value)
@@ -205,7 +163,7 @@ class Mainframe(tk.Frame):
         self.after(self.TimerInterval,self.GetClntTemp)
    
     def GetBatVolt(self):
-        ## replace this with code to read sensor
+        GAIN = 1
         #self.value = adc.read_adc(3, gain=GAIN)
         self.value = random.randint(0,150)/10
         self.BatVolt.set(self.value)
@@ -213,89 +171,78 @@ class Mainframe(tk.Frame):
         # Now repeat call
         self.TimerInterval = 125
         self.after(self.TimerInterval,self.GetBatVolt)
+    
     # This function is called periodically from FuncAnimation
-    def animate(self,i, ax1, ax2, xs, temps, lights, temp_c, lux):
+    def animate(self,i, ax1, ax2, xs, variables_1, variables_2, variable_1, variable_2, update_interval, graph_duration):
     
         # Update data to display temperature and light values
         try:
-            new_temp = random.randint(0,120)
-            new_lux = random.randint(0,120)
+            new_variable_1 = random.randint(0,120)
+            new_variable_2 = random.randint(0,120)
         except:
             pass
-    
-        # Update our labels
-        temp_c.set(new_temp)
-        lux.set(new_lux)
     
         # Append timestamp to x-axis list
         timestamp = mdates.date2num(dt.datetime.now())
         xs.append(timestamp)
     
         # Append sensor data to lists for plotting
-        temps.append(new_temp)
-        lights.append(new_lux)
+        variables_1.append(new_variable_1)
+        variables_2.append(new_variable_2)
     
-        # Limit lists to a set number of elements
+        # Limit lists to a set number of elements and graph length
+        max_elements = int(round(((graph_duration*1000)/update_interval),0))
         xs = xs[-max_elements:]
-        temps = temps[-max_elements:]
-        lights = lights[-max_elements:]
+        variables_1 = variables_1[-max_elements:]
+        variables_2 = variables_2[-max_elements:]
     
         # Clear, format, and plot light values first (behind)
         color = 'tab:orange'
         ax1.clear()
-        ax1.set_ylabel('KUHLWASSERTEMP [°C]', color=color)
-        ax1.tick_params(axis='y', labelcolor=color)
-        ax1.tick_params(axis='x', labelcolor=color)
-        ax1.fill_between(xs, temps, 0, linewidth=2, color=color, alpha=0.3)
+        ax1.set_ylabel('KUHLW. [°C]', color=color, weight = 'bold')
+        ax1.tick_params(axis='y', labelcolor=color, pad = 1, length = 0, gridOn = True)
+        ax1.tick_params(axis='x', labelcolor=color, pad = 0)
+        ax1.fill_between(xs, variables_1, 0, linewidth=2, color=color, alpha=0.3)
     
         # Clear, format, and plot temperature values (in front)
         color = 'tab:blue'
         ax2.clear()
-        ax2.set_ylabel('OELTEMP [°C]', color=color)
-        ax2.tick_params(axis='y', labelcolor=color)
-        ax2.plot(xs, lights, linewidth=2, color=color)
-
+        ax2.set_ylabel('OELTEMP [°C]', color=color,weight = 'bold')
+        ax2.tick_params(axis='y', labelcolor=color, pad = 1, length = 0)
+        ax2.plot(xs, variables_2, linewidth=2, color=color)
         
         # Format timestamps to be more readable
         ax1.xaxis.set_major_formatter(mdates.DateFormatter('%M:%S'))
         self.fig.autofmt_xdate()
     
         # Make sure plots stay visible or invisible as desired
-        ax1.collections[0].set_visible(temp_plot_visible)
-        ax2.get_lines()[0].set_visible(light_plot_visible)
+        ax1.collections[0].set_visible(True)
+        ax2.get_lines()[0].set_visible(True)
     
-    # Dummy function prevents segfault
-    def _destroy(self, event):
-        pass
- 
-        
+       
 class Window(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
         #Fonts
-        #text = tk.Text(self)
-        #Labelfont = Font(family="Times New Roman",size= 60)
-        #text.configure(font=Labelfont)
         # set the title bar text
         self.title('Bentron E30')
-        # Make sure app window is big enough to show title 
-
+        # Uncomment to remove title bar:
+        self.overrideredirect(1)
+        # Configre window            
         self.resizable(width=False, height=False)
         self.geometry('{}x{}'.format(240, 320))
         self.configure(background='black')
-        #self.attributes('-fullscreen', True)
-        
-        # create Mainframe window
-        self.bind('<Escape>',self.smallwindow)
+        # Creat key binds
+        self.bind('<Escape>',self.Destroy)
         self.bind('<F11>',self.fullscreen)
-            
-        self.bind('<F10>',self.toggle_window)
+        self.bind('<F10>',self.smallwindow)
+        # create Mainframe window
         Mainframe(self).grid()
         # now start
         self.mainloop()    
-    def toggle_window(self,event):
-        Mainframe(self).destroy()
-
+        
+    def Destroy(self,event):
+        self.destroy()
          
     def fullscreen(self,event):
         self.attributes('-fullscreen', True)   
@@ -309,5 +256,6 @@ class Window(tk.Tk):
 # create an Window object
 # it will run itself
 if __name__ == '__main__':
-    #Thread(target = func1).start()
+    # run Window class
     Window()
+    
