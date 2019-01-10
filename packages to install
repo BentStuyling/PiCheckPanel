@@ -1,1 +1,11 @@
 
+pip3 install matplotlib
+pip3 install numpy
+
+sudo apt-get install python3-pip python3-dev
+wget https://github.com/lhelontra/tensorflow-on-arm/releases/download/v1.8.0/tensorflow-1.8.0-cp35-none-linux_armv7l.whl
+sudo pip3 install /tensorflow-1.8.0-cp35-none-linux_armv7l.whl
+sudo apt-get install libatlas-base-dev
+
+create a new directory in your home folder called ".fonts" (/home/pi/.fonts  – note the dot). 
+Then copy ds-digital font from www.dafont.com into there. 
