@@ -1,0 +1,15 @@
+
+In case of stretch lite install follow this guide and isntall RPD and also step 3
+https://www.raspberrypi.org/forums/viewtopic.php?t=133691
+
+
+Follow instructions over here: https://www.xgadget.de/anleitung/2-2-spi-display-ili9341-am-raspberry-betreiben/
+
+sudo nano /usr/share/X11/xorg.conf.d/99-fbturbo.conf 
+change fb0 to fb1
+
+set following values in sudo nano /etc/rc.local
+con2fbmap 0 0 
+sudo FRAMEBUFFER=/dev/fb0 startx
+
+
