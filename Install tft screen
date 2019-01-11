@@ -12,4 +12,4 @@ set following values in sudo nano /etc/rc.local
 con2fbmap 0 0 
 sudo FRAMEBUFFER=/dev/fb0 startx
 
-
+https://github.com/notro/fbtft/wiki/Framebuffer-use
