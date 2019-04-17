@@ -9,7 +9,11 @@ sudo nano /usr/share/X11/xorg.conf.d/99-fbturbo.conf
 change fb0 to fb1
 
 set following values in sudo nano /etc/rc.local
-con2fbmap 0 0 
-sudo FRAMEBUFFER=/dev/fb0 startx
+con2fbmap 1 1 
+sudo FRAMEBUFFER=/dev/fb1 startx
+
+FRAMEBUFFER=/dev/fb0 startx in tty2 om HDMI te starten
+FRAMEBUFFER=/dev/fb1 startx in tty1 om desktop op tftpanel te starten
+
 
 https://github.com/notro/fbtft/wiki/Framebuffer-use
