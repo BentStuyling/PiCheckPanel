@@ -12,8 +12,9 @@ set following values in sudo nano /etc/rc.local
 con2fbmap 1 1 
 sudo FRAMEBUFFER=/dev/fb1 startx
 
+Developpen met HDMI scherm, in Command LIne:
 FRAMEBUFFER=/dev/fb0 startx in tty2 om HDMI te starten
 FRAMEBUFFER=/dev/fb1 startx in tty1 om desktop op tftpanel te starten
 
-om te framebuffer copyen:
+om te framebuffer copyen (nu nog niet nodig):
 https://github.com/notro/fbtft/wiki/Framebuffer-use
