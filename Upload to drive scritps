@@ -13,13 +13,13 @@ After=network-online.target
 Type=simple
 User=pi
 WorkingDirectory=/home/pi
+ExecStartPre=/bin/sleep 30
 ExecStart=/usr/bin/python3 /home/pi/auto_sync_ul.py
 ExecStartPost= /usr/bin/python3 /home/pi/auto_sync_dl.py
 
+
 [Install]
 WantedBy=multi-user.target
-
-
 
 then enable and start the service:
 sudo systemctl daemon-reload
@@ -28,5 +28,5 @@ sudo systemctl start gd_sync.service
 
 make the scrip excecutable:
 sudo chmod +x /home/pi/ auto_sync_ul.py
-
+sudo chmod +x /home/pi/ auto_sync_dl.py
 reboot
