@@ -14,6 +14,7 @@ Type=simple
 User=pi
 WorkingDirectory=/home/pi
 ExecStart=/usr/bin/python3 /home/pi/auto_sync_ul.py
+ExecStartPost= /usr/bin/python3 /home/pi/auto_sync_dl.py
 
 [Install]
 WantedBy=multi-user.target
