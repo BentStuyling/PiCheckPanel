@@ -1,1 +1,31 @@
 https://github.com/dtsvetkov1/Google-Drive-sync
+
+
+make a new service:
+sudo nano /lib/systemd/system/gd_sync.service
+
+put in this file:
+[Unit]
+Description=My Script Service
+After=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi
+ExecStart=/usr/bin/python3 /home/pi/auto_sync_ul.py
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+then enable and start the service:
+sudo systemctl daemon-reload
+sudo systemctl enable gd_sync.service
+sudo systemctl start gd_sync.service
+
+make the scrip excecutable:
+sudo chmod +x /home/pi/ auto_sync_ul.py
+
+reboot
