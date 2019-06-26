@@ -4,6 +4,7 @@ https://www.raspberrypi.org/forums/viewtopic.php?t=133691
 
 
 Follow instructions over here: https://www.xgadget.de/anleitung/2-2-spi-display-ili9341-am-raspberry-betreiben/
+Misschien nog beter: http://lallafa.de/blog/2015/03/fbtft-setup-on-modern-raspbian/
 
 sudo nano /usr/share/X11/xorg.conf.d/99-fbturbo.conf 
 change fb0 to fb1
