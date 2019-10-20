@@ -23,3 +23,6 @@ Run sudo nano /lib/udev/hwclock-set and comment out these three lines:
 #fi
 
 ##
+Installing BME280 humidity, pressure and temp sensor:
+https://pypi.org/project/RPi.bme280/
+sudo pip3 install RPi.bme280
