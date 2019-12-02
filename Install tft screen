@@ -11,7 +11,7 @@ change fb0 to fb1
 
 set following values in sudo nano /etc/rc.local
 con2fbmap 1 1 
-sudo FRAMEBUFFER=/dev/fb1 startx
+sudo FRAMEBUFFER=/dev/fb1 startx -- -nocursor
 
 Developpen met HDMI scherm, in Command LIne:
 FRAMEBUFFER=/dev/fb0 startx in tty2 om HDMI te starten
