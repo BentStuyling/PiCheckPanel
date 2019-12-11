@@ -185,8 +185,9 @@ class Status(tk.Frame):
         
         # put your widgets here
         # screen title
+        self.Title = tk.IntVar()
         tk.Label(frame_lable_Title, font=TitleFont, fg=Labelcolor, 
-                 bg = 'black', text = 'STATUS').place(relx = .5, rely =0.5, anchor = 'center')
+                 bg = 'black', textvariable = self.Title).place(relx = .5, rely =0.5, anchor = 'center')
         # white line in first canvas
         linecanvas_1.create_line(0, 1,240, 1, fill = 'white', width = 2)
         # First row frames for lables and values
@@ -275,12 +276,21 @@ class Status(tk.Frame):
         tk.Label(frame_row_7, font = StatusFont, fg =StatusValuecolor,
                  bg = 'black', text = '%').place(x = 178, y =15, anchor ='w')    
         
+        self.GetTitle()
         self.Get_time()
         self.Get_date()
         self.Get_wifi()
         self.Get_Temp()
         self.Get_Humid()
-        
+    
+    def GetTitle(self):
+        if Warning == 'none':
+            self.Title.set('STATUS')
+        else:
+            self.Title.set(Warning)
+        self.TimerInterval = 1000 # Update interval of this sensor value
+        self.after(self.TimerInterval,self.GetTitle)    
+    
     def Get_time(self):
         self.date = time.localtime()
         self.value = "{}:{}:{}".format(self.date.tm_hour, self.date.tm_min, self.date.tm_sec)
@@ -375,8 +385,9 @@ class PageOne(tk.Frame):
         
         # put your widgets here
         # screen title
+        self.Title = tk.IntVar()
         tk.Label(frame_lable_Title, font=TitleFont, fg=Labelcolor, 
-                 bg = 'black', text = 'MOTOR').place(relx = .5, rely =0.5, anchor = 'center')
+                 bg = 'black', textvariable = self.Title).place(relx = .5, rely =0.5, anchor = 'center')
         # white line in first canvas
         linecanvas_1.create_line(0, 1,240, 1, fill = 'white', width = 2)
         
@@ -420,7 +431,7 @@ class PageOne(tk.Frame):
         linecanvas_2.create_line(0, 4, 240, 4, fill = 'white', width = 2)
 
         #Call Get [value] which will call itself after a delay
-        
+        self.GetTitle()
         self.GetValPos_1()
         self.GetValPos_2()
         self.GetValPos_3()
@@ -486,7 +497,14 @@ class PageOne(tk.Frame):
             interval=self.update_interval,
             blit=True)
 
-            
+    def GetTitle(self):
+        if Warning == 'none':
+            self.Title.set('MOTOR')
+        else:
+            self.Title.set(Warning)
+        self.TimerInterval = 1000 # Update interval of this sensor value
+        self.after(self.TimerInterval,self.GetTitle)    
+
     def GetValPos_1(self):
         self.value = get_signal.OilTemp(self)
         # if self.value > 110:
@@ -808,8 +826,9 @@ class PageThree(tk.Frame):
         
         # put your widgets here
         # screen title
+        self.Title = tk.IntVar()
         tk.Label(frame_lable_Title, font=TitleFont, fg=Labelcolor, 
-                 bg = 'black', text = 'UMGEBUNG').place(relx = .5, rely =0.5, anchor = 'center')
+                 bg = 'black', textvariable = self.Title).place(relx = .5, rely =0.5, anchor = 'center')
         # white line in first canvas
         linecanvas_1.create_line(0, 1,240, 1, fill = 'white', width = 2)
         
@@ -838,8 +857,16 @@ class PageThree(tk.Frame):
         tk.Label(frame_value_row_3, font = UnitFont, fg =Unitcolor,
                  bg = 'black',text = 'C').place(x = 112, y =19, anchor ='w') 
         
+        self.GetTitle()
         self.GetValPos_1() #In this caseValpos_1 (Pressure), ValPos_2 (altutude) and ValPos_3 (outside temp) as well
     
+    def GetTitle(self):
+        if Warning == 'none':
+            self.Title.set('AUSSEN')
+        else:
+            self.Title.set(Warning)
+        self.TimerInterval = 1000 # Update interval of this sensor value
+        self.after(self.TimerInterval,self.GetTitle)
     def GetValPos_1(self):
         #pressure
         self.press= get_signal.AirPressure(self)
@@ -852,7 +879,7 @@ class PageThree(tk.Frame):
         self.ValPos_2.set(self.altitude)  # set value to display
         self.TimerInterval = 5000 # Update interval of this sensor value
         self.after(self.TimerInterval,self.GetValPos_1)
-
+    
 ## sensors    
 #Create an ADS1015 ADC (12-bit) instance.
 adc_1 = Adafruit_ADS1x15.ADS1115(address=0x48) 
