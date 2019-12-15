@@ -14,9 +14,6 @@ con2fbmap 1 1
 even checken of de volgende regel er ook wel bij moet:
 sudo FRAMEBUFFER=/dev/fb1 startx
 
-Prevent the mouse cursor from showing up:
-sudo nano /usr/bin/startx
-change the defaultserverargs line to: defaultserverargs="-nocursor"
 
 Developpen met HDMI scherm, in Command LIne:
 FRAMEBUFFER=/dev/fb0 startx in tty2 om HDMI te starten
