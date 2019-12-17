@@ -18,7 +18,7 @@ import pigpio, read_PWM
 ## reading PWM signals
 RPM_GPIO = 26
 pi = pigpio.pi()
-rpm_signl =  read_PWM.reader(pi, RPM_GPIO)
+FuelRate_signl =  read_PWM.reader(pi, RPM_GPIO)
 
 ## barometric pressure/humid/temp
 calibration_params = bme280.load_calibration_params(smbus2.SMBus(1), 0x76)
@@ -413,14 +413,14 @@ class PageOne(tk.Frame):
         tk.Label(frame_value_row_2,font = UnitFont, fg =Unitcolor,
                  bg = 'black', text = 'C').place(x = 60, y =19, anchor ='w')   
 
-        #Engine RPM:
+        #Fuel Rate:
         tk.Label(frame_lable_row_2, font=LabelFont, fg=Labelcolor, 
-                 bg = 'black', text = 'UMW.').place(x = 120, y= 4)
+                 bg = 'black', text = 'GEBRG.').place(x = 120, y= 4)
         self.ValPos_4 = tk.IntVar()
         tk.Label(frame_value_row_2, font = ValueFont, fg =Valuecolor,
                  bg = 'black', textvariable = self.ValPos_4).place(x = 200, y =15, anchor ='e')
         tk.Label(frame_value_row_2,font = UnitFont, fg =Unitcolor,
-                 bg = 'black', text = 'dc').place(x = 200, y =19, anchor ='w')        
+                 bg = 'black', text = 'L/h').place(x = 200, y =19, anchor ='w')        
 
         # white line in first canvas
         linecanvas_2.create_line(0, 4, 240, 4, fill = 'white', width = 2)
@@ -531,11 +531,11 @@ class PageOne(tk.Frame):
     #     self.TimerInterval = 175 # Update interval of this sensor value
     #     self.after(self.TimerInterval,self.GetValPos_4)
     def GetValPos_4(self):
-        self.value = get_signal.EngineRPM(self)
+        self.value = get_signal.FuelRate(self)
         if self.value == "--":
             self.ValPos_4.set(self.value)
         else:
-            self.ValPos_4.set(round(self.value,1)) 
+            self.ValPos_4.set(round(self.value,3)) 
         self.TimerInterval = 175 # Update interval of this sensor value
         self.after(self.TimerInterval,self.GetValPos_4)        
     
@@ -897,10 +897,11 @@ class get_signal:
         self.newvalue = round(random.uniform(0,80)/10,1)
         #self.newvalue = abs(round((((4.096/32768)*adc_1.read_adc(0, gain=1)-0.475)/4)*9,1))
         try:
-            self.value = round(self.oldvalue*0.3 + self.newvalue*0.7,1)
+            self.value = round(self.oldoilpress*0.3 + self.newvalue*0.7,1)
+            self.oldoilpress = self.value
         except:
-            self.value = round(self.newvalue,1)
-        self.oldvalue = self.value
+            self.oldoilpress= round(self.newvalue,1)
+        
         return self.value
         
     def FuelPress(self):
@@ -988,12 +989,37 @@ class get_signal:
     
     def EngineRPM(self):
         try:
-            self.p = rpm_signl
+            self.p = FuelRate_signl
+            self.newvalue = self.p.frequency()*60
+            try:
+                self.value = round(self.oldrpm*0.2 + self.newvalue*0.8,0)
+                self.oldrpm = self.value
+            except:
+                self.oldrpm = round(self.newvalue,1)
+        except:
+            self.value = '--'
+        return self.value
+        
+    def FuelRate(self):
+        try:
+            self.p = FuelRate_signl
             self.f = self.p.frequency()
             self.pw = self.p.pulse_width()
-            self.dc = self.p.duty_cycle()
-            # self.value = self.f*60,0
-            self.value = self.dc
+            #self.newvalue = self.p.duty_cycle()
+            # self.newvalue = self.f*60
+            self.newvalue = ((self.pw-0.08)*self.f/100)*0.1918*24
+            #e34: 0 280 150 714 for Bosch injector in 535i 1989 to 1993 
+            # http://users.erols.com/srweiss/tableifc.htm#BOSCH
+            # 191.8 cc/min at 3.0bar
+            
+            try:
+                self.value = round(self.oldFR*0.2 + self.newvalue*0.8,2)
+                self.oldFR = self.value
+            except:
+                self.oldFR = round(self.newvalue,1)
+            
+            print(self.value)
+            print(self.f)
         except:
             self.value = '--'
         return self.value

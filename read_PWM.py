@@ -7,6 +7,9 @@
 import time
 import pigpio # http://abyz.co.uk/rpi/pigpio/python.html
 
+#need to start 'sudo pigpiod' first
+
+
 class reader:
    """
    A class to read PWM pulses and calculate their frequency
@@ -14,7 +17,7 @@ class reader:
    happens per second.  The duty cycle is the percentage of
    pulse high time per cycle.
    """
-   def __init__(self, pi, gpio, weighting=0.2):
+   def __init__(self, pi, gpio, weighting=0.0):
       """
       Instantiate with the Pi and gpio of the PWM signal
       to monitor.
@@ -79,10 +82,10 @@ class reader:
 
    def pulse_width(self):
       """
-      Returns the PWM pulse width in microseconds.
+      Returns the PWM pulse width in miliseconds.
       """
       if self._high is not None:
-         return self._high
+         return self._high/1000
       else:
          return 0.0
 
