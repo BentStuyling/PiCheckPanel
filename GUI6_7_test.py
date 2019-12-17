@@ -1006,8 +1006,7 @@ class get_signal:
             self.f = self.p.frequency()
             self.pw = self.p.pulse_width()
             #self.newvalue = self.p.duty_cycle()
-            # self.newvalue = self.f*60
-            self.newvalue = ((self.pw-0.08)*self.f/100)*0.1918*24
+            self.newvalue = ((self.pw-0.08)/1000)*self.f*0.1918*60*3
             #e34: 0 280 150 714 for Bosch injector in 535i 1989 to 1993 
             # http://users.erols.com/srweiss/tableifc.htm#BOSCH
             # 191.8 cc/min at 3.0bar
@@ -1019,7 +1018,7 @@ class get_signal:
                 self.oldFR = round(self.newvalue,1)
             
             print(self.value)
-            print(self.f)
+            print(self.pw)
         except:
             self.value = '--'
         return self.value
