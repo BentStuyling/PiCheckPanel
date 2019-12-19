@@ -11,7 +11,7 @@ sudo apt-get install python3-pip python3-dev
 sudo apt-get install libatlas-base-dev
 
 sudo apt-get install xarchiver
-
+sudo apt-get install python3-tk
 
 create a new directory in your home folder called ".fonts" (/home/pi/.fonts  – note the dot). 
 Then copy ds-digital font from www.dafont.com into there. 
