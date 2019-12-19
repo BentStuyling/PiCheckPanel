@@ -12,6 +12,10 @@ sudo apt-get install libatlas-base-dev
 
 sudo apt-get install xarchiver
 sudo apt-get install python3-tk
+sudo pip3 install Adafruit-ADS1x15
+sudo pip3 install smbus2
+sudo pip3 install bme280
+
 
 create a new directory in your home folder called ".fonts" (/home/pi/.fonts  – note the dot). 
 Then copy ds-digital font from www.dafont.com into there. 
