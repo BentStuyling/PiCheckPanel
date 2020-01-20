@@ -1,6 +1,6 @@
 ## Digital HUD check panel for BMW E30 based on Raspberry Pi
-version = 7.0
-Update_date = '(14-01-2019)'
+version = 7.1
+Update_date = '(19-01-2019)'
 
 import tkinter as tk
 from tkinter.font import Font
@@ -18,7 +18,7 @@ import pigpio, read_PWM
 ## reading PWM signals
 pi = pigpio.pi()
 # Fuel rate signal
-FR_GPIO = 23
+FR_GPIO =23
 FuelRate_signl =  read_PWM.reader(pi, FR_GPIO)
 # RPM signal
 RPM_GPIO = 16
@@ -126,9 +126,9 @@ class MainApp(tk.Tk):
             if self.pagenr ==2:
                 self.show_frame("PageTwo")
             if self.pagenr ==3:
-                self.show_frame("PageThree")
-            if self.pagenr ==4:
                 self.show_frame("PageFour")
+            if self.pagenr ==4:
+                self.show_frame("PageThree")
             self.pagenr = self.pagenr +1
             
             if self.pagenr == 5:
@@ -138,7 +138,7 @@ class MainApp(tk.Tk):
             self.pagenr =3
  
     def pushbutton(self,frame_class):
-        if GPIO.input(11) ==0:
+        if GPIO.input(11) ==1:
             try:
                 print(self.switchtime) 
 
@@ -158,10 +158,10 @@ class MainApp(tk.Tk):
                     self.show_frame("PageTwo")
                     self.switchtime = time.time()
                 if self.pagenr ==3:
-                    self.show_frame("PageThree")
+                    self.show_frame("PageFour")
                     self.switchtime = time.time()
                 if self.pagenr ==4:
-                    self.show_frame("PageFour")
+                    self.show_frame("PageThree")
                     self.switchtime = time.time()    
                 self.pagenr = self.pagenr +1
                 if self.pagenr == 5:
@@ -180,7 +180,6 @@ class MainApp(tk.Tk):
         with open(self.filename, 'a', newline='') as csvfile:
             logwriter = csv.writer(csvfile, delimiter=',')
             logwriter.writerow(["{}:{}:{}".format(self.date.tm_hour, self.date.tm_min, self.date.tm_sec),get_signal.ClntTemp(self), get_signal.OilTemp(self), get_signal.DiffTemp(self), get_signal.BatVolt(self), str(get_signal.OilPress(self))] )
-            
         self.TimerInterval = 5000 # Update interval of this sensor value
         self.after(self.TimerInterval,self.Logging)
         
@@ -569,7 +568,7 @@ class PageOne(tk.Frame):
     def RPM_poller(self):
         self.newvalue = get_signal.RPM(self)
         try:
-            self.rpm= self.rpm*0.2 + self.newvalue*0.8
+            self.rpm= self.rpm*0.1 + self.newvalue*0.9
         except:
             self.rpm= 0 
         self.TimerInterval = 100 # Update interval of this sensor value
@@ -952,9 +951,9 @@ class PageFour(tk.Frame):
                  bg = 'black', text = 'GESCHW').place(x = 5, y =4)
         self.ValPos_1 = tk.IntVar()
         tk.Label(frame_value_row_1, font = ValueFont, fg =Valuecolor,
-                 bg = 'black' , textvariable = self.ValPos_1).place(x = 60, y =15, anchor ='e')
+                 bg = 'black' , textvariable = self.ValPos_1).place(x = 70, y =15, anchor ='e')
         tk.Label(frame_value_row_1, font = UnitFont, fg =Unitcolor,
-                 bg = 'black',text = 'km/h').place(x = 60, y =19, anchor ='w')
+                 bg = 'black',text = 'km/h').place(x = 70, y =19, anchor ='w')
         
         #pressure
         tk.Label(frame_lable_row_1, font=LabelFont, fg=Labelcolor, 
@@ -970,9 +969,9 @@ class PageFour(tk.Frame):
                  bg = 'black', text = 'VERBR.').place(x = 5, y =4)
         self.ValPos_3 = tk.IntVar()
         tk.Label(frame_value_row_2, font = ValueFont,fg =Valuecolor,
-                 bg = 'black', textvariable = self.ValPos_3).place(x = 60, y =15, anchor ='e')
+                 bg = 'black', textvariable = self.ValPos_3).place(x = 70, y =15, anchor ='e')
         tk.Label(frame_value_row_2,font = UnitFont, fg =Unitcolor,
-                 bg = 'black', text = 'L/km').place(x = 60, y =19, anchor ='w')   
+                 bg = 'black', text = 'km/L').place(x = 70, y =19, anchor ='w')   
 
         #Fuel Rate L/h:
         tk.Label(frame_lable_row_2, font=LabelFont, fg=Labelcolor, 
@@ -987,6 +986,7 @@ class PageFour(tk.Frame):
         linecanvas_2.create_line(0, 4, 240, 4, fill = 'white', width = 2)
 
         #Call Get [value] which will call itself after a delay
+        
         self.SPD_poller()
         self.GetValPos_1()
         self.GetValPos_2()
@@ -1058,29 +1058,38 @@ class PageFour(tk.Frame):
             
     def GetValPos_1(self):
         self.value = self.SPD
-        if self.value < 0:
-            self.ValPos_4.set("--")
+        if self.value <= 1:
+            self.ValPos_1.set(0)
         else:
-            self.ValPos_4.set(round(self.value))
-        
+            self.ValPos_1.set(round(self.value))
+       
 
         self.TimerInterval = 175 # Update interval of this sensor value
         
         self.after(self.TimerInterval,self.GetValPos_1)
     
     def GetValPos_2(self):
-        self.value == "--"
+        try:
+            self.dt_VP2 = time.time()-self.t0_VP2      # delta time [s]
+            self.t0_VP2 = time.time()
+            self.dx_VP2 = self.dx_VP2 + (self.dt_VP2*(self.SPD/3.6))/1000
+        except:
+            self.t0_VP2 = time.time()
+            self.dx_VP2 = 0
+            
+        
+        self.ValPos_2.set(round(self.dx_VP2))
+        
         self.TimerInterval = 1000 # Update interval of this sensor value
         self.after(self.TimerInterval,self.GetValPos_2)   
         
     def GetValPos_3(self):
         try:
             self.value = self.SPD/self.FR
-            if 100 <=self.value <= 0.01:
-                self.ValPos_3.set("--")
-            else:
-                print(self.value)
+            if 100 >= self.value >= 0:
                 self.ValPos_3.set(round(self.value,1))
+            else:
+                self.ValPos_3.set("--")
         except:
             self.ValPos_3.set("--")
 
@@ -1090,18 +1099,17 @@ class PageFour(tk.Frame):
 
     def GetValPos_4(self):
         self.value = self.FR
-        if self.value < 0.1:
+        if self.value <= 0.1:
             self.ValPos_4.set("--")
         else:
             self.ValPos_4.set(round(self.value,1))
         
-
+        
         self.TimerInterval = 175 # Update interval of this sensor value
         self.after(self.TimerInterval,self.GetValPos_4)     
     
     def SPD_poller(self):
         self.newvalue = get_signal.Speed(self)
-        
         try:
             self.SPD= self.SPD*0.2 + self.newvalue*0.8
         except:
@@ -1112,7 +1120,6 @@ class PageFour(tk.Frame):
     def FR_poller(self):
         self.newvalue = get_signal.FuelRate(self)
         try:
-            
             self.FR= self.FR*0.2 + self.newvalue*0.8
         except:
             self.FR= 0 
@@ -1265,21 +1272,24 @@ class get_signal:
         return self.value
     
     def RPM(self):
-        self.value = RPM_signl.frequency()*60
-        
+        self.value = RPM_signl.frequency()*20
         return self.value
      
     def Speed(self):
-        Wheelcircumf = 1.905    #195/60R15
-        self.value = (SPD_signl.frequency()/9)*Wheelcircumf*3.6
+        Wheelcircumf = 1.930    #195/60R15
+        self.value = (SPD_signl.frequency()/9)*Wheelcircumf*3.6 #km/h
+        if self.value <= 1:
+            self.value = 0
         return self.value 
-     
-        
+
     def FuelRate(self):
-        # self.f = FuelRate_signl.frequency()
-        # self.pw = 
-        #self.newvalue = self.p.duty_cycle()
-        self.value = ((FuelRate_signl.pulse_width()-0.08)/1000)*FuelRate_signl.frequency()*0.1918*60*3
+        self.f = FuelRate_signl.frequency()  #in Hz
+        if self.f >=5 :
+            self.pw = (1/self.f)*1000 - (FuelRate_signl.pulse_width()-0.08) # in ms
+            self.value = (self.pw/1000)*self.f*0.1918*60*6 #L/hr
+        else:  
+            self.value = 0
+       
         #e34: 0 280 150 714 for Bosch injector in 535i 1989 to 1993 
         # http://users.erols.com/srweiss/tableifc.htm#BOSCH
         # 191.8 cc/min at 3.0bar
