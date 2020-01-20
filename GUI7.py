@@ -438,6 +438,7 @@ class PageOne(tk.Frame):
         #Call Get [value] which will call itself after a delay
         
         self.GetValPos_1()
+        self.OilPress_poller()
         self.GetValPos_2()
         self.GetValPos_3()
         self.RPM_poller()
@@ -489,10 +490,7 @@ class PageOne(tk.Frame):
         self.line1, = self.ax1.plot(self.xs, self.ys1,linewidth=3, color=color)
         color = 'tab:orange'
         self.line2, = self.ax1.plot(self.xs, self.ys2,linewidth=3, color=color)
-        
-       
 
-        
         #Add all elements to frame
         for w in Plotframe.winfo_children():
             w.grid(padx =0, pady =0)
@@ -521,11 +519,8 @@ class PageOne(tk.Frame):
         self.after(self.TimerInterval,self.GetValPos_1)
     
     def GetValPos_2(self):
-        self.value = get_signal.OilPress(self)
-        if self.value == "--":
-            self.ValPos_2.set(self.value)
-        else:
-            self.ValPos_2.set(self.value)
+        self.value = round(self.OilPress,1)
+        self.ValPos_2.set(self.value)
         self.TimerInterval = 175 # Update interval of this sensor value
         self.after(self.TimerInterval,self.GetValPos_2)   
         
@@ -564,6 +559,15 @@ class PageOne(tk.Frame):
 
         self.TimerInterval = 175 # Update interval of this sensor value
         self.after(self.TimerInterval,self.GetValPos_4)     
+    
+    def OilPress_poller(self):
+        self.newvalue = get_signal.OilPress(self)
+        try:
+            self.OilPress= self.OilPress*0.1 + self.newvalue*0.9
+        except:
+            self.OilPress= 0 
+        self.TimerInterval = 100 # Update interval of this sensor value
+        self.after(self.TimerInterval,self.OilPress_poller)
         
     def RPM_poller(self):
         self.newvalue = get_signal.RPM(self)
@@ -1179,12 +1183,10 @@ class get_signal:
 
     def OilPress(self):
         #self.newvalue = round(random.uniform(0,80)/10,1)
-        self.newvalue = abs(round((((4.096/32768)*adc_1.read_adc(0, gain=1)-0.475)/4)*9,1))
-        try:
-            self.value = round(self.oldoilpress*0.3 + self.newvalue*0.7,1)
-            self.oldoilpress = self.value
-        except:
-            self.oldoilpress= round(self.newvalue,1)
+        self.value = (((4.096/32768)*adc_1.read_adc(0, gain=1)-0.475)/4)*9
+        if self.value <= 0.1:
+            self.value = 0
+        return self.value 
         
         return self.value
         
